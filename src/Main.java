@@ -1,12 +1,15 @@
-// Zadanie 1
-
 import java.util.ArrayList;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import static java.lang.Integer.parseInt;
 
+// Suppress high complexity errors in IDE
 @SuppressWarnings("ALL")
+
 public class Main {
     public static String read(String path) {
         try {
@@ -22,6 +25,8 @@ public class Main {
         zadanie1();
         System.out.println("Zadanie 2");
         zadanie2();
+        System.out.println("Zadanie 3");
+        zadanie3();
 
     }
     public static void zadanie1() {
@@ -116,9 +121,53 @@ public class Main {
             System.out.println("Nie znaleziono odpowiednich prostokątów.");
         }
 
-        // arraylist of pairs of
+    }
+    public static void zadanie3() {
 
+        String file_content = read("./src/data/prostokaty.txt");
+        String[] lines = file_content.split("\n");
+        Map<Integer, ArrayList<Integer>> heights = new HashMap<>();
 
+        for (String line : lines) {
+
+            if (line.isBlank()) return;
+
+            String[] number_strings = line.split("\\s+");
+
+            int h = parseInt(number_strings[0].trim());
+            int s = parseInt(number_strings[1].trim());
+
+            if (!heights.containsKey(h))
+                heights.put(h, new ArrayList<>());
+
+            heights.get(h).add(s);
+
+        }
+
+        heights.forEach((Integer height, ArrayList<Integer> widths) -> {
+            heights.get(height).sort( (a,b) -> { return -a.compareTo(b); } );
+        });
+
+        // For 2
+        zadanie3_totalFor(2, heights);
+        // For 3
+        zadanie3_totalFor(3, heights);
+        // For 5
+        zadanie3_totalFor(5, heights);
+
+    }
+    private static void zadanie3_totalFor(int maxindex, Map<Integer, ArrayList<Integer>> heights) {
+
+        AtomicInteger maxwidth = new AtomicInteger();
+        heights.forEach((Integer height, ArrayList<Integer> widths) -> {
+            AtomicInteger maxwidth_temp = new AtomicInteger();
+            for (int i = 0; i < (widths.size() > maxindex ? maxindex : widths.size()); i++)
+                maxwidth_temp.addAndGet(widths.get(i));
+            if (maxwidth_temp.intValue() > maxwidth.intValue())
+                maxwidth.getAndSet(maxwidth_temp.intValue());
+        });
+
+        System.out.printf("Maksymalna długość dla 2 prostokątów: %d\n", maxwidth.intValue());
 
     }
 }
